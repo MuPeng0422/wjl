@@ -102,6 +102,8 @@ export default {
   },
   data () {
     return {
+      apiUrl: 'https://apple.atx.net.cn',
+      socketUrl: this.apiUrl.replace('https', 'wss').replace('http', 'ws'),
       loading: false,
       dataList: [],
       faceImgUrl: 'data:img/jpg;base64,',
@@ -118,7 +120,8 @@ export default {
       timeoutnum: null,
       // 建立的连接
       ws: null,
-      num: Math.ceil(Math.random() * 999999)
+      num: Math.ceil(Math.random() * 999999),
+      heartCheck: {}
     }
   },
   created () {
@@ -132,7 +135,7 @@ export default {
   methods: {
     initWebSocket () {
       // 初始化weosocket
-      const wsuri = 'wss:apple.atx.net.cn/imserver/' + this.num
+      const wsuri = this.socketUrl + '/imserver/' + this.num
       // 建立连接
       this.websock = new WebSocket(wsuri)
       // 连接成功
@@ -170,10 +173,12 @@ export default {
       this.timeoutObj && clearTimeout(this.timeoutObj)
       this.serverTimeoutObj && clearTimeout(this.serverTimeoutObj)
       this.timeoutObj = setTimeout(() => {
-        // 这里发送一个心跳，后段收到后，返回一个心跳信息
+        // 这里发送一个心跳，后端收到后，返回一个心跳信息
         if (this.websock.readyState === 1) {
           // 如果连接正常
-          this.websock.send('heartCheck')
+          this.heartCheck.data = new Date().getTime()
+          let msg = JSON.stringify(this.heartCheck)
+          this.websocketsend(msg)
         } else {
           // 否则重连
           this.reconnect()
@@ -199,14 +204,20 @@ export default {
       // 重连
       this.reconnect()
     },
+    // 接收服务器推送的信息
     websocketonmessage (e) {
-      // 接收服务器推送的信息
-      // 打印收到服务器的内容
-      console.log(e.data)
       // 收到服务器信息，心跳重置
       this.reset()
-      if (e.data !== '连接成功') {
-        this.dataList.unshift(JSON.parse(e.data).data)
+
+      // 处理服务器推送过来的数据
+      let result = JSON.parse(e.data)
+      if (result.type === '0') {
+        // 心跳检测 暂不处理
+      } else if (result.type === '1') {
+        // 连接成功 暂不处理
+      } else if (result.type === '2') {
+        // zhiyinqing推送的人脸识别数据
+        this.dataList.unshift(result.data)
       }
     },
     websocketclose (e) {
@@ -214,16 +225,15 @@ export default {
       // 关闭
       console.log('connection closed', e.code)
       // 提示关闭
-      console.error('连接已关闭', 3)
+      console.error('连接已关闭')
       // 重连
       this.reconnect()
     },
     getWebsocketData () {
       this.loading = true
-      this.$axios.get('https://apple.atx.net.cn/push/face/index').then((res) => {
+      this.$axios.get(this.apiUrl + '/push/face/index').then((res) => {
         this.loading = false
-        var data = res.data.data.rows
-        this.dataList = data
+        this.dataList = res.data.data.rows
       })
     },
     websocketsend (msg) {
