@@ -103,7 +103,6 @@ export default {
   data () {
     return {
       apiUrl: 'https://apple.atx.net.cn',
-      socketUrl: this.apiUrl.replace('https', 'wss').replace('http', 'ws'),
       loading: false,
       dataList: [],
       faceImgUrl: 'data:img/jpg;base64,',
@@ -135,7 +134,8 @@ export default {
   methods: {
     initWebSocket () {
       // 初始化weosocket
-      const wsuri = this.socketUrl + '/imserver/' + this.num
+      const socketUrl = this.apiUrl.replace('https', 'wss').replace('http', 'ws')
+      const wsuri = socketUrl + '/imserver/' + this.num
       // 建立连接
       this.websock = new WebSocket(wsuri)
       // 连接成功
