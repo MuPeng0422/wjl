@@ -106,23 +106,119 @@ export default {
       dataList: [],
       faceImgUrl: 'data:img/jpg;base64,',
       activeIndex: 6,
-      ws: null, // 建立的连接
+      // 是否真正建立连接
+      lockReconnect: false,
+      // 30秒一次心跳
+      timeout: 30 * 1000,
+      // 心跳心跳倒计时
+      timeoutObj: null,
+      // 心跳倒计时
+      serverTimeoutObj: null,
+      // 断开 重连倒计时
+      timeoutnum: null,
+      // 建立的连接
+      ws: null,
       num: Math.ceil(Math.random() * 999999)
     }
   },
   created () {
+    // 页面刚进入时开启长连接
     this.initWebSocket()
   },
+  destroyed: function () {
+    // 页面销毁时关闭长连接
+    this.websocketclose()
+  },
   methods: {
-    initWebSocket () { // 初始化weosocket
+    initWebSocket () {
+      // 初始化weosocket
       const wsuri = 'wss:apple.atx.net.cn/imserver/' + this.num
+      // 建立连接
       this.websock = new WebSocket(wsuri)
-      this.websock.onmessage = this.websocketonmessage
+      // 连接成功
       this.websock.onopen = this.websocketonopen
+      // 连接失败
       this.websock.onerror = this.websocketonerror
+      // 接收消息
+      this.websock.onmessage = this.websocketonmessage
+      // 连接关闭
       this.websock.onclose = this.websocketclose
     },
-    websocketonopen () { // 连接建立之后执行send方法发送数据
+    reconnect () {
+      // 重新连接
+      if (!this.lockReconnect) {
+        this.lockReconnect = true
+        // 没连接上会一直重连，设置延迟避免请求过多
+        this.timeoutnum && clearTimeout(this.timeoutnum)
+        this.timeoutnum = setTimeout(() => {
+          // 新连接
+          this.initWebSocket()
+          this.lockReconnect = false
+        }, 5000)
+      }
+    },
+    // 重置心跳
+    reset () {
+      // 清除时间
+      clearTimeout(this.timeoutObj)
+      clearTimeout(this.serverTimeoutObj)
+      // 重启心跳
+      this.start()
+    },
+    // 开启心跳
+    start () {
+      this.timeoutObj && clearTimeout(this.timeoutObj)
+      this.serverTimeoutObj && clearTimeout(this.serverTimeoutObj)
+      this.timeoutObj = setTimeout(() => {
+        // 这里发送一个心跳，后段收到后，返回一个心跳信息
+        if (this.websock.readyState === 1) {
+          // 如果连接正常
+          this.websock.send('heartCheck')
+        } else {
+          // 否则重连
+          this.reconnect()
+        }
+        this.serverTimeoutObj = setTimeout(() => {
+          // 超时关闭
+          this.websock.close()
+        }, this.timeout)
+      }, this.timeout)
+    },
+    websocketonopen () {
+      // 连接建立之后执行send方法发送数据
+      // 开启心跳
+      this.start()
+      this.getWebsocketData()
+    },
+    websocketonerror (e) {
+      // 连接失败事件
+      // 错误
+      console.log('WebSocket连接发生错误', e)
+      // 错误提示
+      console.error('Websocket error, Check you internet!', e)
+      // 重连
+      this.reconnect()
+    },
+    websocketonmessage (e) {
+      // 接收服务器推送的信息
+      // 打印收到服务器的内容
+      console.log(e.data)
+      // 收到服务器信息，心跳重置
+      this.reset()
+      if (e.data !== '连接成功') {
+        this.dataList.unshift(JSON.parse(e.data).data)
+      }
+    },
+    websocketclose (e) {
+      // 连接关闭事件
+      // 关闭
+      console.log('connection closed', e.code)
+      // 提示关闭
+      console.error('连接已关闭', 3)
+      // 重连
+      this.reconnect()
+    },
+    getWebsocketData () {
       this.loading = true
       this.$axios.get('https://apple.atx.net.cn/push/face/index').then((res) => {
         this.loading = false
@@ -130,22 +226,10 @@ export default {
         this.dataList = data
       })
     },
-    websocketonerror () { // 连接建立失败重连
-      // this.initWebSocket()
-    },
-    websocketonmessage (e) { // 数据接收
-      console.log('接收的数据：')
-      if (e.data !== '连接成功') {
-        this.dataList.unshift(JSON.parse(e.data).data)
-      }
-    },
-    websocketsend (Data) { // 数据发送
-      this.websock.send(Data)
-    },
-    websocketclose (e) { // 关闭
-      console.log('断开连接', e)
-      console.log('又重新连接了')
-      // this.initWebSocket()
+    websocketsend (msg) {
+      // 向服务器发送信息
+      // 数据发送
+      this.websock.send(msg)
     }
   }
 }
