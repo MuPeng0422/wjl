@@ -107,11 +107,7 @@ export default {
       faceImgUrl: 'data:img/jpg;base64,',
       activeIndex: 6,
       ws: null, // 建立的连接
-      lockReconnect: false, // 是否真正建立连接
-      timeout: 28 * 1000, // 30秒一次心跳
-      timeoutObj: null, // 心跳心跳倒计时
-      serverTimeoutObj: null, // 心跳倒计时
-      timeoutnum: null // 断开 重连倒计时
+      num: Math.ceil(Math.random() * 999999)
     }
   },
   created () {
@@ -119,7 +115,7 @@ export default {
   },
   methods: {
     initWebSocket () { // 初始化weosocket
-      const wsuri = 'ws:apple.atx.net.cn/imserver/333'
+      const wsuri = 'wss:apple.atx.net.cn/imserver/' + this.num
       this.websock = new WebSocket(wsuri)
       this.websock.onmessage = this.websocketonmessage
       this.websock.onopen = this.websocketonopen
@@ -128,14 +124,14 @@ export default {
     },
     websocketonopen () { // 连接建立之后执行send方法发送数据
       this.loading = true
-      this.$axios.get('http://apple.atx.net.cn/push/face/index').then((res) => {
+      this.$axios.get('https://apple.atx.net.cn/push/face/index').then((res) => {
         this.loading = false
         var data = res.data.data.rows
         this.dataList = data
       })
     },
     websocketonerror () { // 连接建立失败重连
-      this.initWebSocket()
+      // this.initWebSocket()
     },
     websocketonmessage (e) { // 数据接收
       console.log('接收的数据：')
@@ -149,7 +145,7 @@ export default {
     websocketclose (e) { // 关闭
       console.log('断开连接', e)
       console.log('又重新连接了')
-      this.initWebSocket()
+      // this.initWebSocket()
     }
   }
 }

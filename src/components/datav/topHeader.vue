@@ -73,7 +73,7 @@ export default {
       this.$axios.get('https://tianqiapi.com/api?version=v6&appid=71549884&appsecret=XH6bWw5A').then(function (response) {
         var data = response.data
         _this.localweather = data.city + ' ' + data.wea + ' ' + data.tem2 + '℃ ~ ' + data.tem1 + '℃ ' + data.win
-        _this.weatherImg = 'http://tq.daodaoim.com//tianqiapi/skin/pitaya/' + response.data.wea_img + '.png'
+        _this.weatherImg = 'http://tq.daodaoim.com/tianqiapi/skin/pitaya/' + response.data.wea_img + '.png'
       })
     }
   }
