@@ -1,153 +1,67 @@
 <template>
   <div class="top-right-cmp">
     <div class="chart-name">
-      设备故障月趋势
+      设备状态
       <dv-decoration-3 style="width:200px;height:20px;" />
     </div>
-    <dv-charts :option="option" />
+    <div class="device">
+      <ul>
+        <li
+          v-for="(item, index) in data"
+          :key="index"
+        >
+          <div class="address">{{ item.address }}</div>
+          <div class="config"><dv-percent-pond :config="item.config" /></div>
+          <div class="status" :class="bgColor">{{ item.status }}</div>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'TopRightCmp',
+  props: ['devide'],
+  watch: {
+    devide: {
+      deep: true,
+      handler: function (res) {
+        console.log(res)
+        for (var i = 0; i < res.length; i++) {
+          var rows = {}
+          rows['address'] = res[i].address
+          rows['deviceId'] = res[i].deviceId
+          rows['deviceType'] = res[i].deviceType
+          if (res[i].status === 1) {
+            rows['status'] = '在线'
+            this.bgColor = 'green'
+            rows['config'] = {
+              value: 100,
+              colors: ['green', 'darkgreen']
+            }
+          } else if (res[i].status === 0) {
+            rows['status'] = '掉线'
+            this.bgColor = 'red'
+            rows['config'] = {
+              value: 100,
+              lineDash: [5, 1],
+              colors: ['red', 'brown']
+            }
+          }
+
+          this.data.push(rows)
+          if (i >= 4) {
+            return false
+          }
+        }
+      }
+    }
+  },
   data () {
     return {
-      option: {
-        legend: {
-          data: [
-            {
-              name: '收费系统',
-              color: '#00baff'
-            },
-            {
-              name: '监控系统',
-              color: '#ff5ca9'
-            },
-            {
-              name: '通信系统',
-              color: '#3de7c9'
-            },
-            {
-              name: '供配电系统',
-              color: '#f5d94e'
-            }
-          ],
-          textStyle: {
-            fill: '#fff'
-          }
-        },
-        xAxis: {
-          data: [
-            '10/01', '10/02', '10/03', '10/04', '10/05', '10/06', '10/07'
-          ],
-          axisLine: {
-            style: {
-              stroke: '#999'
-            }
-          },
-          axisLabel: {
-            style: {
-              fill: '#999'
-            }
-          },
-          axisTick: {
-            show: false
-          }
-        },
-        yAxis: {
-          data: 'value',
-          splitLine: {
-            show: false
-          },
-          axisLine: {
-            style: {
-              stroke: '#999'
-            }
-          },
-          axisLabel: {
-            style: {
-              fill: '#999'
-            }
-          },
-          axisTick: {
-            show: false
-          },
-          min: 0,
-          max: 8
-        },
-        series: [
-          {
-            name: '收费系统',
-            data: [
-              2.5, 3.5, 6.5, 6.5, 7.5, 6.5, 2.5
-            ],
-            type: 'bar',
-            barStyle: {
-              fill: 'rgba(0, 186, 255, 0.4)'
-            }
-          },
-          {
-            name: '监控系统',
-            data: [
-              2.5, 3.5, 6.5, 6.5, 7.5, 6.5, 2.5
-            ],
-            type: 'line',
-            lineStyle: {
-              stroke: '#ff5ca9'
-            },
-            linePoint: {
-              radius: 4,
-              style: {
-                fill: '#ff5ca9',
-                stroke: 'transparent'
-              }
-            }
-          },
-          {
-            name: '通信系统',
-            data: [
-              1.3, 2.3, 5.3, 5.3, 6.3, 5.3, 1.3
-            ],
-            type: 'line',
-            smooth: true,
-            lineArea: {
-              show: true,
-              gradient: ['rgba(55, 162, 218, 0.6)', 'rgba(55, 162, 218, 0)']
-            },
-            lineStyle: {
-              lineDash: [5, 5]
-            },
-            linePoint: {
-              radius: 4,
-              style: {
-                fill: '#00db95'
-              }
-            }
-          },
-          {
-            data: [
-              0.2, 1.2, 4.2, 4.2, 5.2, 4.2, 0.2
-            ],
-            type: 'line',
-            name: '供配电系统',
-            lineArea: {
-              show: true,
-              gradient: ['rgba(245, 217, 79, 0.8)', 'rgba(245, 217, 79, 0.2)']
-            },
-            lineStyle: {
-              stroke: '#f5d94e'
-            },
-            linePoint: {
-              radius: 4,
-              style: {
-                fill: '#f5d94e',
-                stroke: 'transparent'
-              }
-            }
-          }
-        ]
-      }
+      data: [],
+      bgColor: ''
     }
   }
 }
@@ -166,6 +80,66 @@ export default {
     text-align: right;
     font-size: 20px;
     top: 0;
+  }
+
+  .device{
+    width: 100%;
+    height: calc(~"100% - 70px");
+    margin-top: 70px;
+    ul{
+      width: 100%;
+      height: 100%;
+      padding: 0 0 30px;
+      margin: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      li{
+        width: 100%;
+        height: 10%;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        .address{
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          flex: 1;
+        }
+        .config{
+          width: 60%;
+          padding: 0 20px;
+        }
+        .status{
+          width: 10%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: #fff;
+        }
+        .green {
+          background: green;
+        }
+        .red {
+          background: red;
+        }
+        .dv-percent-pond{
+          width: 100%;
+          height: 100%;
+
+          text{
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  .lc1-chart{
+    width: 100%;
+    height: 100%;
+    padding: 50px;
   }
 }
 </style>

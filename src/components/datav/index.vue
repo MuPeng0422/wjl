@@ -15,17 +15,18 @@
               <div class="charts-container">
                 <div class="chart">
                   <dv-border-box-8>
-                    <left-chart3></left-chart3>
+                    <dv-loading v-if="loading">Loading...</dv-loading>
+                    <left-chart3 :data="personenelData"></left-chart3>
                   </dv-border-box-8>
                 </div>
                 <div class="chart">
                   <dv-border-box-8>
-                    <left-chart2></left-chart2>
+                    <left-chart2 :ageData="queryAgeData"></left-chart2>
                   </dv-border-box-8>
                 </div>
                 <div class="chart">
                   <dv-border-box-8>
-                    <left-chart1></left-chart1>
+                    <left-chart1 :ageData="queryAgeData"></left-chart1>
                   </dv-border-box-8>
                 </div>
               </div>
@@ -46,7 +47,7 @@
                 </div>
                 <div class="rmctc-chart-2">
                   <dv-border-box-4 :reverse="true">
-                    <top-right-cmp></top-right-cmp>
+                    <top-right-cmp :devide="deviceData"></top-right-cmp>
                   </dv-border-box-4>
                 </div>
               </div>
@@ -62,8 +63,8 @@
                         <img :src="faceImgUrl + item.faceUrl" alt="">
                       </div>
                       <div class="details">
-                        <p>{{ item.deviceId }}</p>
-                        <p>{{ item.id }}</p>
+                        <p>{{ item.name }}</p>
+                        <p>{{ item.address }}</p>
                         <p>{{ item.time }}</p>
                       </div>
                     </dv-border-box-8>
@@ -120,12 +121,21 @@ export default {
       // 建立的连接
       ws: null,
       num: Math.ceil(Math.random() * 999999),
-      heartCheck: {}
+      heartCheck: {},
+      // 0未知 1男 2女
+      sex: '',
+      age: '', // 年龄
+      // 0业主，1家庭成员，2租客
+      staffType: '',
+      personenelData: [],
+      queryAgeData: [],
+      deviceData: []
     }
   },
   created () {
     // 页面刚进入时开启长连接
     this.initWebSocket()
+    this.getWebsocketData()
   },
   destroyed: function () {
     // 页面销毁时关闭长连接
@@ -193,7 +203,6 @@ export default {
       // 连接建立之后执行send方法发送数据
       // 开启心跳
       this.start()
-      this.getWebsocketData()
     },
     websocketonerror (e) {
       // 连接失败事件
@@ -211,16 +220,18 @@ export default {
 
       // 处理服务器推送过来的数据
       let result = JSON.parse(e.data)
+      console.log('推送的数据：', result)
       if (result.type === '0') {
         // 心跳检测 暂不处理
       } else if (result.type === '1') {
         // 连接成功 暂不处理
       } else if (result.type === '2') {
         // zhiyinqing推送的人脸识别数据
-        this.dataList.unshift(result.data)
+        this.getFaceData(result)
       }
     },
     websocketclose (e) {
+      console.log(e)
       // 连接关闭事件
       // 关闭
       console.log('connection closed', e.code)
@@ -231,10 +242,100 @@ export default {
     },
     getWebsocketData () {
       this.loading = true
+      // 调用人脸抓拍列表
       this.$axios.get(this.apiUrl + '/push/face/index').then((res) => {
         this.loading = false
-        this.dataList = res.data.data.rows
+        var result = res.data.data.rows
+        var data = []
+        for (var i = 0; i < result.length; i++) {
+          var rows = {}
+          rows['faceUrl'] = result[i].faceUrl
+          rows['time'] = result[i].time
+          rows['address'] = result[i].address
+          if (result[i].personId === '') {
+            rows['name'] = '陌生人'
+          } else {
+            rows['name'] = result[i].staff.name
+          }
+          data.push(rows)
+        }
+        this.dataList = data
       })
+      // 查询设备列表
+      this.$axios.get(this.apiUrl + '/push/face/index/staffPage').then((res) => {
+        this.loading = false
+        var result = res.data.data.rows
+        for (var i = 0; i < result.length; i++) {
+          var rows = []
+          if (result[i].staffGender === 1) {
+            this.sex = '男'
+          } else if (result[i].staffGender === 2) {
+            this.sex = '女'
+          } else {
+            this.sex = '未知'
+          }
+
+          if (result[i].staffType === 0) {
+            this.staffType = '业主'
+          } else if (result[i].staffType === 1) {
+            this.staffType = '家庭成员'
+          } else if (result[i].staffType === 2) {
+            this.staffType = '租客'
+          }
+
+          this.age = this.getAge(result[i].staffBirthday)
+          rows.push(result[i].staffName)
+          rows.push(this.sex)
+          rows.push(this.age)
+          rows.push(result[i].houseAddress)
+          rows.push(this.staffType)
+          this.personenelData.push(rows)
+        }
+      })
+      // 查询小区人员年龄分布
+      this.$axios.get(this.apiUrl + '/push/face/index/queryAge').then((res) => {
+        this.queryAgeData = res.data.data
+      })
+      // 查询
+      this.$axios.get(this.apiUrl + '/push/face/index/queryDevice').then((res) => {
+        this.deviceData = res.data.data.data
+      })
+    },
+    // 获取实时推送的数据
+    getFaceData (result) {
+      var rows = {}
+      rows['faceUrl'] = result.data.faceUrl
+      rows['time'] = this.timestampToTime(result.data.time)
+      rows['address'] = result.data.address
+      if (result.data.personId === '') {
+        rows['name'] = '陌生人'
+      } else {
+        rows['name'] = result.data.staff.name
+      }
+      this.dataList.unshift(rows)
+    },
+    getAge (strAge) {
+      let birthdays = new Date(strAge.replace(/-/g, '/'))
+      let d = new Date()
+      this.age =
+        d.getFullYear() -
+        birthdays.getFullYear() -
+        (d.getMonth() < birthdays.getMonth() ||
+        (d.getMonth() === birthdays.getMonth() &&
+        d.getDate() < birthdays.getDate())
+          ? 1
+          : 0)
+      return this.age
+    },
+    timestampToTime (time) {
+      var date = new Date(time) // 时间戳为10位需*1000，时间戳为13位的话不需乘1000
+      var Y = date.getFullYear() + '-'
+      var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+      var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + ' '
+      var h = date.getHours() < 10 ? '0' + date.getHours() : date.getHours() + ':'
+      var m = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes() + ':'
+      var s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+      return Y + M + D + h + m + s
     },
     websocketsend (msg) {
       // 向服务器发送信息
