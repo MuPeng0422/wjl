@@ -11,7 +11,7 @@ export default {
   watch: {
     data: {
       deep: true,
-      handler: function () {
+      handler: function (res) {
         this.config = {
           header: ['人员姓名', '性别', '年龄', '家庭地址', '人员类型'],
           data: this.data,

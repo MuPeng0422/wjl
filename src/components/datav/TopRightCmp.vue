@@ -89,7 +89,7 @@ export default {
     ul{
       width: 100%;
       height: 100%;
-      padding: 0 0 30px;
+      padding: 0 40px 30px 0;
       margin: 0;
       box-sizing: border-box;
       display: flex;

@@ -1,40 +1,92 @@
 <template>
   <div class="left-chart-1">
-    <div class="lc1-header">小区人员统计</div>
-
-    <div class="lc1-details">人员总数<span><dv-digital-flop :config="option" style="width:200px;height:50px;"/></span></div>
-    <dv-capsule-chart class="lc1-chart" :config="config" />
+    <div class="lc1-details">人员总数<span>{{ number }}</span></div>
+    <dv-charts :option="option" />
   </div>
 </template>
 
 <script>
 export default {
   name: 'LeftChart2',
-  props: ['ageData'],
+  props: ['sexData'],
   watch: {
-    ageData: {
+    sexData: {
       deep: true,
       handler: function (res) {
+        console.log('性别：', res)
         for (var i = 0; i < res.length; i++) {
-          var rows = {}
-          rows['name'] = res[i].ageGroup
-          rows['value'] = Number(res[i].totals)
-          this.data.push(rows)
-          this.number += Number(res[i].totals)
-        }
-        this.optionNumber.push(this.number)
-        this.option = {
-          number: this.optionNumber,
-          content: '{nt}',
-          style: {
-            fontSize: 30,
-            fill: '#3de7c9'
+          if (res[i].gender === '1') {
+            this.xAxisArr.push('男')
+          } else if (res[i].gender === '2') {
+            this.xAxisArr.push('女')
+          } else {
+            this.xAxisArr.push('未知')
           }
+          this.dataArr.push(Number(res[i].count))
+          this.number += Number(res[i].count)
         }
-        this.config = {
-          data: this.data,
-          colors: ['#00baff', '#3de7c9', '#fff', '#ffc530', '#469f4b'],
-          unit: '人'
+        this.option = {
+          xAxis: {
+            data: this.xAxisArr,
+            axisLine: {
+              style: {
+                stroke: '#fff'
+              }
+            },
+            axisLabel: {
+              style: {
+                fontSize: 14,
+                fill: '#fff'
+              }
+            },
+            axisTick: {
+              show: false
+            }
+          },
+          yAxis: {
+            data: 'value',
+            splitLine: {
+              show: false
+            },
+            axisLine: {
+              style: {
+                stroke: '#fff'
+              }
+            },
+            axisLabel: {
+              style: {
+                fontSize: 14,
+                fill: '#fff'
+              }
+            },
+            axisTick: {
+              show: false
+            },
+            min: 0
+          },
+          series: [
+            {
+              name: '年龄',
+              data: this.dataArr,
+              type: 'bar',
+              barWidth: 30,
+              barStyle: {
+                fill: 'rgba(0, 186, 255, 0.4)'
+              },
+              gradient: {
+                color: ['#37a2da', '#67e0e3']
+              },
+              label: {
+                show: true,
+                position: 'center',
+                offset: [0, 0],
+                style: {
+                  fontSize: 20,
+                  fill: '#fff'
+                }
+              }
+            }
+          ]
         }
       }
     }
@@ -43,12 +95,9 @@ export default {
     return {
       data: [],
       number: 0,
-      optionNumber: [],
-      option: {
-      },
-      config2: null,
-      config: {
-      }
+      xAxisArr: [],
+      dataArr: [],
+      option: {}
     }
   }
 }
@@ -75,6 +124,13 @@ export default {
     font-size: 16px;
     display: flex;
     align-items: center;
+
+    span {
+      color: #096dd9;
+      font-weight: bold;
+      font-size: 35px;
+      margin-left: 20px;
+    }
   }
 
   .lc1-chart {

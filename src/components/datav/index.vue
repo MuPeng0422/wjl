@@ -21,7 +21,7 @@
                 </div>
                 <div class="chart">
                   <dv-border-box-8>
-                    <left-chart2 :ageData="queryAgeData"></left-chart2>
+                    <left-chart2 :sexData="querySexData"></left-chart2>
                   </dv-border-box-8>
                 </div>
                 <div class="chart">
@@ -42,7 +42,7 @@
               <div class="rmctc-right-container">
                 <div class="rmctc-chart-1">
                   <dv-border-box-4>
-                    <top-middle-cmp></top-middle-cmp>
+                    <top-middle-cmp :flow="flowData"></top-middle-cmp>
                   </dv-border-box-4>
                 </div>
                 <div class="rmctc-chart-2">
@@ -127,9 +127,11 @@ export default {
       age: '', // 年龄
       // 0业主，1家庭成员，2租客
       staffType: '',
-      personenelData: [],
-      queryAgeData: [],
-      deviceData: []
+      personenelData: [], // 人员信息存储
+      queryAgeData: [], // 人员年龄存储
+      deviceData: [], // 设备存储
+      flowData: [], // 人流量存储
+      querySexData: []
     }
   },
   created () {
@@ -228,6 +230,9 @@ export default {
       } else if (result.type === '2') {
         // zhiyinqing推送的人脸识别数据
         this.getFaceData(result)
+      } else if (result.type === '3') {
+        // zhiyinqing推送的人脸识别数据
+        this.getFlowData(result)
       }
     },
     websocketclose (e) {
@@ -246,6 +251,7 @@ export default {
       this.$axios.get(this.apiUrl + '/push/face/index').then((res) => {
         this.loading = false
         var result = res.data.data.rows
+        console.log(result)
         var data = []
         for (var i = 0; i < result.length; i++) {
           var rows = {}
@@ -255,13 +261,13 @@ export default {
           if (result[i].personId === '') {
             rows['name'] = '陌生人'
           } else {
-            rows['name'] = result[i].staff.name
+            rows['name'] = '未知'
           }
           data.push(rows)
         }
         this.dataList = data
       })
-      // 查询设备列表
+      // 查询人员列表
       this.$axios.get(this.apiUrl + '/push/face/index/staffPage').then((res) => {
         this.loading = false
         var result = res.data.data.rows
@@ -296,12 +302,20 @@ export default {
       this.$axios.get(this.apiUrl + '/push/face/index/queryAge').then((res) => {
         this.queryAgeData = res.data.data
       })
-      // 查询
+      // 查询设备列表
       this.$axios.get(this.apiUrl + '/push/face/index/queryDevice').then((res) => {
         this.deviceData = res.data.data.data
       })
+      // 查询进出口人流量
+      this.$axios.get(this.apiUrl + '/push/face/index/staffListByHour').then((res) => {
+        this.flowData = res.data.data
+      })
+      // 查询人员性别
+      this.$axios.get(this.apiUrl + '/push/face/index/staffGender').then((res) => {
+        this.querySexData = res.data.data
+      })
     },
-    // 获取实时推送的数据
+    // 获取人脸检测实时推送的数据
     getFaceData (result) {
       var rows = {}
       rows['faceUrl'] = result.data.faceUrl
@@ -313,6 +327,16 @@ export default {
         rows['name'] = result.data.staff.name
       }
       this.dataList.unshift(rows)
+    },
+    // 获取人流量实时推送的数据
+    getFlowData (result) {
+      console.log(result)
+      if (Number(result.data.hours) === 0) {
+        this.flowData.splice(0, this.flowData.length)
+      } else {
+        this.flowData.push(result.data)
+      }
+      // this.flowData = result
     },
     getAge (strAge) {
       let birthdays = new Date(strAge.replace(/-/g, '/'))
