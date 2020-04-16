@@ -251,7 +251,6 @@ export default {
       this.$axios.get(this.apiUrl + '/push/face/index').then((res) => {
         this.loading = false
         var result = res.data.data.rows
-        console.log(result)
         var data = []
         for (var i = 0; i < result.length; i++) {
           var rows = {}
@@ -317,6 +316,7 @@ export default {
     },
     // 获取人脸检测实时推送的数据
     getFaceData (result) {
+      console.log(this.timestampToTime(result.data.time))
       var rows = {}
       rows['faceUrl'] = result.data.faceUrl
       rows['time'] = this.timestampToTime(result.data.time)
@@ -336,7 +336,7 @@ export default {
       } else {
         this.flowData.push(result.data)
       }
-      // this.flowData = result
+      console.log(this.flowData)
     },
     getAge (strAge) {
       let birthdays = new Date(strAge.replace(/-/g, '/'))

@@ -2,82 +2,116 @@
   <div class="center-cmp">
     <div class="cc-header">
       <dv-decoration-1 style="width:200px;height:50px;" />
-      <div>进出入人员统计</div>
+      <div>重点监控</div>
       <dv-decoration-1 style="width:200px;height:50px;" />
     </div>
-
-    <div class="cc-details">
-      <div>人员总数</div>
-      <div class="card">2</div>
-      <div class="card">1</div>
-      <div class="card">3</div>
-      <div class="card">7</div>
-    </div>
-
-    <div class="cc-main-container">
-      <div class="ccmc-left">
-        <div class="station-info">
-          <span>1315</span>进入
-        </div>
-        <div class="station-info">
-          <span>415</span>出入
-        </div>
-      </div>
-
-      <dv-active-ring-chart class="ccmc-middle" :config="config" />
-
-      <div class="ccmc-right">
-        <div class="station-info">
-          男<span>90</span>
-        </div>
-        <div class="station-info">
-          女<span>317</span>
-        </div>
-      </div>
-
-      <LabelTag :config="labelConfig" />
+    <div class="video">
+      <ul>
+        <li v-for="(item, index) in videoData" :key="index">
+          <dv-border-box-2>
+            <d-player :options="item.options"></d-player>
+          </dv-border-box-2>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
 
 <script>
-import LabelTag from './LabelTag'
+import dPlayer from 'vue-dplayer'
+import 'vue-dplayer/dist/vue-dplayer.css'
 
 export default {
   name: 'CenterCmp',
   components: {
-    LabelTag
+    dPlayer
   },
   data () {
     return {
-      config: {
-        data: [
-          {
-            name: '收费站',
-            value: 1315
+      videoData: [{
+        options: {
+          video: {
+            url: 'http://static.smartisanos.cn/common/video/t1-ui.mp4',
+            pic: 'http://static.smartisanos.cn/pr/img/video/video_03_cc87ce5bdb.jpg'
           },
-          {
-            name: '监控中心',
-            value: 415
+          autoplay: true,
+          theme: '#FADFA3',
+          live: true,
+          lang: 'zh-cn',
+          screenshot: true,
+          preload: 'auto',
+          volume: 0.7,
+          mutex: false,
+          contextmenu: [{
+            text: 'GitHub',
+            link: 'https://github.com/MoePlayer/vue-dplayer'
+          }]
+        }
+      }, {
+        options: {
+          video: {
+            url: 'http://static.smartisanos.cn/common/video/t1-ui.mp4',
+            pic: 'http://static.smartisanos.cn/pr/img/video/video_03_cc87ce5bdb.jpg'
           },
-          {
-            name: '道路外场',
-            value: 90
+          autoplay: true,
+          theme: '#FADFA3',
+          live: true,
+          lang: 'zh-cn',
+          screenshot: true,
+          preload: 'auto',
+          volume: 0.7,
+          mutex: false,
+          contextmenu: [{
+            text: 'GitHub',
+            link: 'https://github.com/MoePlayer/vue-dplayer'
+          }]
+        }
+      }, {
+        options: {
+          video: {
+            url: 'http://static.smartisanos.cn/common/video/t1-ui.mp4',
+            pic: 'http://static.smartisanos.cn/pr/img/video/video_03_cc87ce5bdb.jpg'
           },
-          {
-            name: '其他',
-            value: 317
-          }
-        ],
-        color: ['#00baff', '#3de7c9', '#fff', '#ffc530', '#469f4b'],
-        lineWidth: 30,
-        radius: '55%',
-        activeRadius: '60%'
-      },
-
-      labelConfig: {
-        data: ['进入', '出入', '男', '女']
-      }
+          autoplay: true,
+          theme: '#FADFA3',
+          live: true,
+          lang: 'zh-cn',
+          screenshot: true,
+          preload: 'auto',
+          volume: 0.7,
+          mutex: false,
+          contextmenu: [{
+            text: 'GitHub',
+            link: 'https://github.com/MoePlayer/vue-dplayer'
+          }]
+        }
+      }, {
+        options: {
+          video: {
+            url: 'http://static.smartisanos.cn/common/video/t1-ui.mp4',
+            pic: 'http://static.smartisanos.cn/pr/img/video/video_03_cc87ce5bdb.jpg'
+          },
+          autoplay: true,
+          theme: '#FADFA3',
+          live: true,
+          lang: 'zh-cn',
+          screenshot: true,
+          preload: 'auto',
+          volume: 0.7,
+          mutex: false,
+          contextmenu: [{
+            text: 'GitHub',
+            link: 'https://github.com/MoePlayer/vue-dplayer'
+          }]
+        }
+      }]
+    }
+  },
+  mounted () {
+  },
+  methods: {
+    play () {
+      console.log('play callback')
     }
   }
 }
@@ -100,83 +134,30 @@ export default {
     font-size: 30px;
   }
 
-  .cc-details {
-    height: 120px;
-    display: flex;
-    justify-content: center;
-    font-size: 32px;
-    align-items: center;
+  .video{
+    width: 100%;
+    height: 100%;
 
-    .card {
-      background-color: rgba(4,49,128,.6);
-      color: #08e5ff;
-      height: 70px;
-      width: 70px;
-      font-size: 45px;
-      font-weight: bold;
-      line-height: 70px;
-      text-align: center;
-      margin: 10px;
-    }
-  }
+    ul{
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, 50%);
+      grid-template-rows: repeat(2, 50%);
+      padding: 20px;
+      box-sizing: border-box;
 
-  .cc-main-container {
-    position: relative;
-    flex: 1;
-    display: flex;
+      li{
+        width: 100%;
+        height: 100%;
+        padding: 5px;
 
-    .ccmc-middle {
-      width: 50%;
-      height: 90%;
-
-      .active-ring-name {
-        font-size: 20px !important;
+        .dv-border-box-2{
+          width: 100%;
+          height: 100%;
+        }
       }
     }
-
-    .ccmc-left, .ccmc-right {
-      width: 25%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      font-size: 24px;
-
-      span {
-        font-size: 40px;
-        font-weight: bold;
-      }
-
-      .station-info {
-        height: 80px;
-        display: flex;
-        align-items: center;
-      }
-    }
-
-    .ccmc-left {
-      align-items: flex-end;
-
-      span {
-        margin-right: 20px;
-      }
-    }
-
-    .ccmc-right {
-      align-items: flex-start;
-
-      span {
-        margin-left: 20px;
-      }
-    }
-  }
-
-  .label-tag {
-    position: absolute;
-    width: 500px;
-    height: 30px;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
   }
 }
 </style>
