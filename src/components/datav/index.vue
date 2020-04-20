@@ -464,17 +464,17 @@ export default {
             box-sizing: border-box;
           }
           .item{
-            width: 100%;
+            height: 60%;
 
             img{
               width: 100%;
+              height: 100%;
             }
           }
 
           .details{
             p{
               color: #00c2ff;
-              margin: 10px 0 0 0;
               text-align: center;
             }
           }

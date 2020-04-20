@@ -15,8 +15,9 @@ export default {
         this.config = {
           header: ['人员姓名', '性别', '年龄', '家庭地址', '人员类型'],
           data: this.data,
-          columnWidth: [50, 100, 60, 100],
-          rowNum: 7,
+          columnWidth: [60, 100, 60, 50],
+          rowNum: 5,
+          align: [1],
           index: true,
           indexHeader: '序号',
           headerBGC: '#1981f6',

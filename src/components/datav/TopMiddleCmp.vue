@@ -32,7 +32,10 @@ export default {
             axisLabel: {
               interval: 4,
               style: {
-                fill: '#fff'
+                fill: '#fff',
+                rotate: 45,
+                textAlign: 'left',
+                textBaseline: 'top'
               }
             },
             axisTick: {

@@ -16,7 +16,7 @@
       </div>
     </div>
     <dv-decoration-10 />
-    <div class="center-title">陕西省公安厅文景路智慧安防小区管理平台</div>
+    <div class="center-title">陕西省公安厅雁塔区智慧安防小区管理平台</div>
   </div>
 </template>
 
