@@ -105,7 +105,6 @@ export default {
   data () {
     return {
       apiUrl: 'http://localhost:7788',
-      localhost: 'http://localhost:8000',
       loading: false,
       dataList: [],
       activeIndex: 6,
@@ -256,7 +255,7 @@ export default {
           for (var i = 0; i < result.length; i++) {
             var rows = {}
             if (res.data.data.islocal) {
-              rows['faceUrl'] = this.localhost + result[i].picUrl
+              rows['faceUrl'] = res.data.data.ip + result[i].picUrl
             } else {
               rows['faceUrl'] = result[i].picUrl
             }
@@ -324,11 +323,7 @@ export default {
     // 获取人脸检测实时推送的数据
     getFaceData (result) {
       var rows = {}
-      if (result.islocal) {
-        rows['faceUrl'] = this.localhost + result.data.picUrl
-      } else {
-        rows['faceUrl'] = result.data.picUrl
-      }
+      rows['faceUrl'] = result.data.picUrl
       rows['time'] = this.timestampToTime(result.data.createTime)
       if (result.data.staffName === null) {
         rows['name'] = '陌生人'
