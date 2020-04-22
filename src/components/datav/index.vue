@@ -65,7 +65,6 @@
                       <div class="details">
                         <div>
                           <p>{{ item.name }}</p>
-                          <p>{{ item.address }}</p>
                           <p>{{ item.time }}</p>
                         </div>
                       </div>
@@ -105,7 +104,8 @@ export default {
   },
   data () {
     return {
-      apiUrl: 'http://192.168.9.9:7788',
+      apiUrl: 'http://localhost:7788',
+      localhost: 'http://localhost:8000',
       loading: false,
       dataList: [],
       activeIndex: 6,
@@ -255,13 +255,16 @@ export default {
           this.loading = false
           for (var i = 0; i < result.length; i++) {
             var rows = {}
-            rows['faceUrl'] = result[i].picUrl
+            if (res.data.data.islocal) {
+              rows['faceUrl'] = this.localhost + result[i].picUrl
+            } else {
+              rows['faceUrl'] = result[i].picUrl
+            }
             rows['time'] = result[i].createTime
-            rows['address'] = result[i].address
-            if (result[i].personId === '') {
+            if (result[i].staffName === null) {
               rows['name'] = '陌生人'
             } else {
-              rows['name'] = '未知'
+              rows['name'] = result[i].staffName
             }
             data.push(rows)
           }
@@ -306,9 +309,9 @@ export default {
         this.queryAgeData = res.data.data
       })
       // 查询设备列表
-      this.$axios.get(this.apiUrl + '/push/face/index/queryDevice').then((res) => {
-        this.deviceData = res.data.data.data
-      })
+      // this.$axios.get(this.apiUrl + '/push/face/index/queryDevice').then((res) => {
+      //   this.deviceData = res.data.data.data
+      // })
       // 查询进出口人流量
       this.$axios.get(this.apiUrl + '/push/face/index/staffListByHour').then((res) => {
         this.flowData = res.data.data
@@ -321,13 +324,16 @@ export default {
     // 获取人脸检测实时推送的数据
     getFaceData (result) {
       var rows = {}
-      rows['faceUrl'] = result.data.picUrl
+      if (result.islocal) {
+        rows['faceUrl'] = this.localhost + result.data.picUrl
+      } else {
+        rows['faceUrl'] = result.data.picUrl
+      }
       rows['time'] = this.timestampToTime(result.data.createTime)
-      rows['address'] = result.data.address
-      if (result.data.personId === '') {
+      if (result.data.staffName === null) {
         rows['name'] = '陌生人'
       } else {
-        rows['name'] = result.data.staff.name
+        rows['name'] = result.data.staffName
       }
       this.dataList.unshift(rows)
     },
@@ -458,6 +464,7 @@ export default {
         justify-content: space-between;
 
         .personal-item{
+          width: 16%;
 
           .border-box-content{
             display: flex;
@@ -465,7 +472,9 @@ export default {
             box-sizing: border-box;
           }
           .item{
+            width: 100%;
             height: 60%;
+            overflow: hidden;
 
             img{
               width: 100%;
