@@ -63,9 +63,11 @@
                         <img :src="faceImgUrl + item.faceUrl" alt="">
                       </div>
                       <div class="details">
-                        <p>{{ item.name }}</p>
-                        <p>{{ item.address }}</p>
-                        <p>{{ item.time }}</p>
+                        <div>
+                          <p>{{ item.name }}</p>
+                          <p>{{ item.address }}</p>
+                          <p>{{ item.time }}</p>
+                        </div>
                       </div>
                     </dv-border-box-8>
                   </div>
@@ -316,7 +318,6 @@ export default {
     },
     // 获取人脸检测实时推送的数据
     getFaceData (result) {
-      console.log(this.timestampToTime(result.data.time))
       var rows = {}
       rows['faceUrl'] = result.data.faceUrl
       rows['time'] = this.timestampToTime(result.data.time)
@@ -330,13 +331,11 @@ export default {
     },
     // 获取人流量实时推送的数据
     getFlowData (result) {
-      console.log(result)
       if (Number(result.data.hours) === 0) {
         this.flowData.splice(0, this.flowData.length)
       } else {
         this.flowData.push(result.data)
       }
-      console.log(this.flowData)
     },
     getAge (strAge) {
       let birthdays = new Date(strAge.replace(/-/g, '/'))
@@ -473,6 +472,11 @@ export default {
           }
 
           .details{
+            height: 40%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
             p{
               color: #00c2ff;
               text-align: center;

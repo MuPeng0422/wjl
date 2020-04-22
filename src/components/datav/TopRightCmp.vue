@@ -1,20 +1,11 @@
 <template>
   <div class="top-right-cmp">
     <div class="chart-name">
-      设备状态
+      设备报警
       <dv-decoration-3 style="width:200px;height:20px;" />
     </div>
     <div class="device">
-      <ul>
-        <li
-          v-for="(item, index) in data"
-          :key="index"
-        >
-          <div class="address">{{ item.address }}</div>
-          <div class="config"><dv-percent-pond :config="item.config" /></div>
-          <div class="status" :class="bgColor">{{ item.status }}</div>
-        </li>
-      </ul>
+      <dv-scroll-board :config="config" />
     </div>
   </div>
 </template>
@@ -22,48 +13,69 @@
 <script>
 export default {
   name: 'TopRightCmp',
-  props: ['devide'],
-  watch: {
-    devide: {
-      deep: true,
-      handler: function (res) {
-        console.log(res)
-        for (var i = 0; i < res.length; i++) {
-          var rows = {}
-          rows['address'] = res[i].address
-          rows['deviceId'] = res[i].deviceId
-          rows['deviceType'] = res[i].deviceType
-          if (res[i].status === 1) {
-            rows['status'] = '在线'
-            this.bgColor = 'green'
-            rows['config'] = {
-              value: 100,
-              colors: ['green', 'darkgreen']
-            }
-          } else if (res[i].status === 0) {
-            rows['status'] = '掉线'
-            this.bgColor = 'red'
-            rows['config'] = {
-              value: 100,
-              lineDash: [5, 1],
-              colors: ['red', 'brown']
-            }
-          }
-
-          this.data.push(rows)
-          if (i >= 4) {
-            return false
-          }
-        }
-      }
-    }
-  },
   data () {
     return {
       data: [],
-      bgColor: ''
+      config: {
+        header: ['报警时间', '报警设备', '故障'],
+        data: [
+          ['2020-04-10 16:04:32', '二级指挥平台手报', '消防手报按钮'],
+          ['2020-04-10 15:41:18', '二级指挥平台手报', '消防手报按钮'],
+          ['2020-04-10 15:17:46', '二级指挥平台手报', '消防手报按钮'],
+          ['2020-04-10 14:59:12', '二级指挥平台手报', '消防手报按钮'],
+          ['2020-04-10 14:04:19', '二级指挥平台手报', '消防手报按钮'],
+          ['2020-04-10 13:48:05', '二级指挥平台手报', '消防手报按钮'],
+          ['2020-04-10 13:15:37', '西安怡诚医药包装有限公司总配', '漏电报警'],
+          ['2020-04-10 12:04:32', '二级指挥平台手报', '消防手报按钮']
+        ],
+        columnWidth: [170, 300],
+        align: ['center'],
+        rowNum: 5,
+        headerBGC: '#1981f6',
+        headerHeight: 45,
+        oddRowBGC: 'rgba(0, 44, 81, 0.8)',
+        evenRowBGC: 'rgba(10, 29, 50, 0.8)'
+      }
     }
   }
+  // created () {
+  //   this.getData()
+  // },
+  // watch: {
+  //   'data': {
+  //     handler: function (val) {
+  //       this.config = {
+  //         header: ['报警时间', '报警设备', '故障'],
+  //         data: val,
+  //         columnWidth: [170, 200],
+  //         align: ['center'],
+  //         rowNum: 5,
+  //         headerBGC: '#1981f6',
+  //         headerHeight: 45,
+  //         oddRowBGC: 'rgba(0, 44, 81, 0.8)',
+  //         evenRowBGC: 'rgba(10, 29, 50, 0.8)'
+  //       }
+  //     }
+  //   }
+  // },
+  // methods: {
+  //   getData () {
+  //     var random = parseInt(Math.random() * (10 - 1 + 1) + 1, 10)
+  //     setInterval(() => {
+  //       var list = []
+  //       let dates = new Date()
+  //       let yy = dates.getFullYear()
+  //       let mm = (dates.getMonth() + 1).toString().padStart(2, '0')
+  //       let dd = (dates.getDate()).toString().padStart(2, '0')
+  //       let hh = (dates.getHours()).toString().padStart(2, '0')
+  //       let min = (dates.getMinutes()).toString().padStart(2, '0')
+  //       let ss = (dates.getSeconds()).toString().padStart(2, '0')
+  //       let myDate = `${yy}-${mm}-${dd} ${hh}:${min}:${ss}`
+  //       list.push(myDate)
+  //       this.data.push(list)
+  //     }, random * 1000)
+  //   }
+  // }
 }
 </script>
 
@@ -85,7 +97,7 @@ export default {
   .device{
     width: 100%;
     height: calc(~"100% - 70px");
-    margin-top: 70px;
+    margin-top: 55px;
     ul{
       width: 100%;
       height: 100%;
