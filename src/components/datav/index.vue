@@ -60,7 +60,7 @@
                        :key="item.id" v-show="activeIndex>index">
                     <dv-border-box-8>
                       <div class="item">
-                        <img :src="faceImgUrl + item.faceUrl" alt="">
+                        <img :src="item.faceUrl" alt="">
                       </div>
                       <div class="details">
                         <div>
@@ -105,10 +105,9 @@ export default {
   },
   data () {
     return {
-      apiUrl: 'https://apple.atx.net.cn',
+      apiUrl: 'http://192.168.9.9:7788',
       loading: false,
       dataList: [],
-      faceImgUrl: 'data:img/jpg;base64,',
       activeIndex: 6,
       // 是否真正建立连接
       lockReconnect: false,
@@ -248,25 +247,28 @@ export default {
       this.reconnect()
     },
     getWebsocketData () {
-      this.loading = true
       // 调用人脸抓拍列表
       this.$axios.get(this.apiUrl + '/push/face/index').then((res) => {
-        this.loading = false
         var result = res.data.data.rows
         var data = []
-        for (var i = 0; i < result.length; i++) {
-          var rows = {}
-          rows['faceUrl'] = result[i].faceUrl
-          rows['time'] = result[i].time
-          rows['address'] = result[i].address
-          if (result[i].personId === '') {
-            rows['name'] = '陌生人'
-          } else {
-            rows['name'] = '未知'
+        if (result.length > 0) {
+          this.loading = false
+          for (var i = 0; i < result.length; i++) {
+            var rows = {}
+            rows['faceUrl'] = result[i].picUrl
+            rows['time'] = result[i].createTime
+            rows['address'] = result[i].address
+            if (result[i].personId === '') {
+              rows['name'] = '陌生人'
+            } else {
+              rows['name'] = '未知'
+            }
+            data.push(rows)
           }
-          data.push(rows)
+          this.dataList = data
+        } else {
+          this.loading = true
         }
-        this.dataList = data
       })
       // 查询人员列表
       this.$axios.get(this.apiUrl + '/push/face/index/staffPage').then((res) => {
@@ -319,8 +321,8 @@ export default {
     // 获取人脸检测实时推送的数据
     getFaceData (result) {
       var rows = {}
-      rows['faceUrl'] = result.data.faceUrl
-      rows['time'] = this.timestampToTime(result.data.time)
+      rows['faceUrl'] = result.data.picUrl
+      rows['time'] = this.timestampToTime(result.data.createTime)
       rows['address'] = result.data.address
       if (result.data.personId === '') {
         rows['name'] = '陌生人'
