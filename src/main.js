@@ -5,10 +5,12 @@ import App from './App'
 import './assets/common.less'
 import dataV from '@jiaminghi/data-view'
 import axios from 'axios'
+import ip from '../config/ip'
 
 Vue.use(dataV)
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
+Vue.prototype.ip = ip
 
 /* eslint-disable no-new */
 new Vue({

@@ -104,7 +104,7 @@ export default {
   },
   data () {
     return {
-      apiUrl: 'http://localhost:7788',
+      apiUrl: this.ip.ip,
       loading: false,
       dataList: [],
       activeIndex: 6,
