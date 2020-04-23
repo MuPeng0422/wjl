@@ -104,7 +104,7 @@ export default {
   },
   data () {
     return {
-      apiUrl: this.ip.ip,
+      apiUrl: window.g.BASE_URL,
       loading: false,
       dataList: [],
       activeIndex: 6,
@@ -135,6 +135,7 @@ export default {
     }
   },
   created () {
+    console.log(this.apiUrl)
     // 页面刚进入时开启长连接
     this.initWebSocket()
     this.getWebsocketData()

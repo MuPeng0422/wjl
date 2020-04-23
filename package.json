@@ -16,7 +16,11 @@
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
     "vue": "^2.5.2",
-    "vue-dplayer": "^0.0.10"
+    "vue-dplayer": "^0.0.10",
+    "vue-video-player": "4.0.6",
+    "videojs-contrib-hls": "5.14.1",
+    "videojs-contrib-hls.js": "3.2.0",
+    "videojs-flash": "2.1.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

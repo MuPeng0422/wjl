@@ -5,12 +5,14 @@ import App from './App'
 import './assets/common.less'
 import dataV from '@jiaminghi/data-view'
 import axios from 'axios'
-import ip from '../config/ip'
+import VideoPlayer from 'vue-video-player'
+require('video.js/dist/video-js.css')
+require('vue-video-player/src/custom-theme.css')
 
+Vue.use(VideoPlayer)
 Vue.use(dataV)
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
-Vue.prototype.ip = ip
 
 /* eslint-disable no-new */
 new Vue({

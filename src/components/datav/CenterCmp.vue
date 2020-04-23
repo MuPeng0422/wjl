@@ -7,9 +7,15 @@
     </div>
     <div class="video">
       <ul>
-        <li v-for="(item, index) in videoData" :key="index">
+        <li>
           <dv-border-box-2>
-            <d-player :options="item.options"></d-player>
+             <video-player  class="video-player vjs-custom-skin"
+                             ref="videoPlayer"
+                             :options="playerOptions"
+                             :playsinline="true"
+                             customEventName="customstatechangedeventname"
+                            >
+              </video-player>
           </dv-border-box-2>
         </li>
       </ul>
@@ -18,100 +24,48 @@
 </template>
 
 <script>
-import dPlayer from 'vue-dplayer'
-import 'vue-dplayer/dist/vue-dplayer.css'
+import 'vue-video-player/src/custom-theme.css'
+import 'video.js/dist/video-js.css'
+import 'videojs-flash'
+import { videoPlayer } from 'vue-video-player'
 
 export default {
   name: 'CenterCmp',
   components: {
-    dPlayer
+    videoPlayer
   },
   data () {
     return {
-      videoData: [{
-        options: {
-          video: {
-            url: 'http://static.smartisanos.cn/common/video/t1-ui.mp4',
-            pic: 'http://static.smartisanos.cn/pr/img/video/video_03_cc87ce5bdb.jpg'
+      playerOptions: {
+        // videojs options
+        muted: true,
+        language: 'en',
+        playbackRates: [0.7, 1.0, 1.5, 2.0],
+        techOrder: ['flash', 'html5'], // 设置顺序，
+        sourceOrder: true,
+        fluid: true,
+        flash: { hls: { withCredentials: false } },
+        html5: { hls: { withCredentials: false } },
+        sources: [
+          {
+            type: 'rtmp/flv',
+            src: 'rtmp://rtmp01open.ys7.com/openlive/f01018a141094b7fa138b9d0b856507b.hd'
           },
-          autoplay: true,
-          theme: '#FADFA3',
-          live: true,
-          lang: 'zh-cn',
-          screenshot: true,
-          preload: 'auto',
-          volume: 0.7,
-          mutex: false,
-          contextmenu: [{
-            text: 'GitHub',
-            link: 'https://github.com/MoePlayer/vue-dplayer'
-          }]
+          {
+            withCredentials: false,
+            type: 'application/x-mpegURL',
+            src: 'http://hls01open.ys7.com/openlive/f01018a141094b7fa138b9d0b856507b.hd.m3u8' // 这是hls流
+          }
+        ],
+        width: document.documentElement.clientWidth,
+        autoplay: true,
+        controlBar: {
+          timeDivider: true,
+          durationDisplay: true,
+          remainingTimeDisplay: false,
+          fullscreenToggle: true // 全屏按钮
         }
-      }, {
-        options: {
-          video: {
-            url: 'http://static.smartisanos.cn/common/video/t1-ui.mp4',
-            pic: 'http://static.smartisanos.cn/pr/img/video/video_03_cc87ce5bdb.jpg'
-          },
-          autoplay: true,
-          theme: '#FADFA3',
-          live: true,
-          lang: 'zh-cn',
-          screenshot: true,
-          preload: 'auto',
-          volume: 0.7,
-          mutex: false,
-          contextmenu: [{
-            text: 'GitHub',
-            link: 'https://github.com/MoePlayer/vue-dplayer'
-          }]
-        }
-      }, {
-        options: {
-          video: {
-            url: 'http://static.smartisanos.cn/common/video/t1-ui.mp4',
-            pic: 'http://static.smartisanos.cn/pr/img/video/video_03_cc87ce5bdb.jpg'
-          },
-          autoplay: true,
-          theme: '#FADFA3',
-          live: true,
-          lang: 'zh-cn',
-          screenshot: true,
-          preload: 'auto',
-          volume: 0.7,
-          mutex: false,
-          contextmenu: [{
-            text: 'GitHub',
-            link: 'https://github.com/MoePlayer/vue-dplayer'
-          }]
-        }
-      }, {
-        options: {
-          video: {
-            url: 'http://static.smartisanos.cn/common/video/t1-ui.mp4',
-            pic: 'http://static.smartisanos.cn/pr/img/video/video_03_cc87ce5bdb.jpg'
-          },
-          autoplay: true,
-          theme: '#FADFA3',
-          live: true,
-          lang: 'zh-cn',
-          screenshot: true,
-          preload: 'auto',
-          volume: 0.7,
-          mutex: false,
-          contextmenu: [{
-            text: 'GitHub',
-            link: 'https://github.com/MoePlayer/vue-dplayer'
-          }]
-        }
-      }]
-    }
-  },
-  mounted () {
-  },
-  methods: {
-    play () {
-      console.log('play callback')
+      }
     }
   }
 }
@@ -155,6 +109,17 @@ export default {
         .dv-border-box-2{
           width: 100%;
           height: 100%;
+
+          .video-player{
+            width: 100%;
+            height: 100%;
+
+            .video-js{
+              width: 100%;
+              height: 100%;
+            }
+
+          }
         }
       }
     }
