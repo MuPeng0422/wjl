@@ -9,13 +9,7 @@
       <ul>
         <li>
           <dv-border-box-2>
-             <video-player  class="video-player vjs-custom-skin"
-                             ref="videoPlayer"
-                             :options="playerOptions"
-                             :playsinline="true"
-                             customEventName="customstatechangedeventname"
-                            >
-              </video-player>
+            <v-liveplayer ref="myvideo"></v-liveplayer>
           </dv-border-box-2>
         </li>
       </ul>
@@ -24,48 +18,41 @@
 </template>
 
 <script>
-import 'vue-video-player/src/custom-theme.css'
-import 'video.js/dist/video-js.css'
-import 'videojs-flash'
-import { videoPlayer } from 'vue-video-player'
-
+import Liveplayer from './liveplayer'
 export default {
   name: 'CenterCmp',
   components: {
-    videoPlayer
+    'v-liveplayer': Liveplayer
   },
   data () {
     return {
-      playerOptions: {
-        // videojs options
-        muted: true,
-        language: 'en',
-        playbackRates: [0.7, 1.0, 1.5, 2.0],
-        techOrder: ['flash', 'html5'], // 设置顺序，
-        sourceOrder: true,
-        fluid: true,
-        flash: { hls: { withCredentials: false } },
-        html5: { hls: { withCredentials: false } },
-        sources: [
-          {
-            type: 'rtmp/flv',
-            src: 'rtmp://rtmp01open.ys7.com/openlive/f01018a141094b7fa138b9d0b856507b.hd'
-          },
-          {
-            withCredentials: false,
-            type: 'application/x-mpegURL',
-            src: 'http://hls01open.ys7.com/openlive/f01018a141094b7fa138b9d0b856507b.hd.m3u8' // 这是hls流
-          }
-        ],
-        width: document.documentElement.clientWidth,
-        autoplay: true,
-        controlBar: {
-          timeDivider: true,
-          durationDisplay: true,
-          remainingTimeDisplay: false,
-          fullscreenToggle: true // 全屏按钮
+      videoData: [
+        {
+          ref: 'myvideo1'
+        },
+        {
+          ref: 'myvideo2'
+        },
+        {
+          ref: 'myvideo3'
+        },
+        {
+          ref: 'myvideo4'
         }
+      ]
+    }
+  },
+  created () {
+    this.$axios.get(window.g.API_ROOT + '/api/v1/GetSrc').then((res) => {
+      console.log(res)
+      for (var i = 0; i < res.data.src.length; i++) {
+        this.PlayVideo(res.data.src[i].strToken)
       }
+    })
+  },
+  methods: {
+    PlayVideo (token) {
+      this.$refs.myvideo.PlayVideo(token)
     }
   }
 }
@@ -109,17 +96,6 @@ export default {
         .dv-border-box-2{
           width: 100%;
           height: 100%;
-
-          .video-player{
-            width: 100%;
-            height: 100%;
-
-            .video-js{
-              width: 100%;
-              height: 100%;
-            }
-
-          }
         }
       }
     }

@@ -16,6 +16,7 @@
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
     "vue": "^2.5.2",
+    "iview": "^3.2.1",
     "vue-dplayer": "^0.0.10",
     "vue-video-player": "4.0.6",
     "videojs-contrib-hls": "5.14.1",

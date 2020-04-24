@@ -2,14 +2,19 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
-import './assets/common.less'
+import './assets/css/common.less'
 import dataV from '@jiaminghi/data-view'
 import axios from 'axios'
+
+import iView from 'iview'
+import 'iview/dist/styles/iview.css'
+
 import VideoPlayer from 'vue-video-player'
 require('video.js/dist/video-js.css')
 require('vue-video-player/src/custom-theme.css')
 
 Vue.use(VideoPlayer)
+Vue.use(iView)
 Vue.use(dataV)
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
