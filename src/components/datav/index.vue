@@ -131,12 +131,16 @@ export default {
       queryAgeData: [], // 人员年龄存储
       deviceData: [], // 设备存储
       flowData: [], // 人流量存储
-      querySexData: []
+      querySexData: [],
+      deptId: ''
     }
   },
   created () {
     // 页面刚进入时开启长连接
-    this.initWebSocket()
+    const data = JSON.parse(localStorage.getItem('store'))
+    this.deptId = data.deptId
+    const client = data.client
+    this.initWebSocket(client)
     this.getWebsocketData()
   },
   destroyed: function () {
@@ -144,10 +148,10 @@ export default {
     this.websocketclose()
   },
   methods: {
-    initWebSocket () {
+    initWebSocket (client) {
       // 初始化weosocket
       const socketUrl = this.apiUrl.replace('https', 'wss').replace('http', 'ws')
-      const wsuri = socketUrl + '/imserver/' + this.num
+      const wsuri = socketUrl + '/imserver/' + client
       // 建立连接
       this.websock = new WebSocket(wsuri)
       // 连接成功
@@ -231,8 +235,17 @@ export default {
         // zhiyinqing推送的人脸识别数据
         this.getFaceData(result)
       } else if (result.type === '3') {
-        // zhiyinqing推送的人脸识别数据
+        // 人流量
         this.getFlowData(result)
+      } else if (result.type === '4') {
+        // 年龄结构。
+        this.getAgeData(result)
+      } else if (result.type === '5') {
+        // 男女比例。
+        this.getSexData(result)
+      } else if (result.type === '6') {
+        // 新增人员。
+        this.getPersonData(result)
       }
     },
     websocketclose (e) {
@@ -247,7 +260,7 @@ export default {
     },
     getWebsocketData () {
       // 调用人脸抓拍列表
-      this.$axios.get(this.apiUrl + '/push/face/index').then((res) => {
+      this.$axios.get(this.apiUrl + '/push/face/index', { params: { deptId: this.deptId } }).then((res) => {
         var result = res.data.data.rows
         var data = []
         if (result.length > 0) {
@@ -273,7 +286,7 @@ export default {
         }
       })
       // 查询人员列表
-      this.$axios.get(this.apiUrl + '/push/face/index/staffPage').then((res) => {
+      this.$axios.get(this.apiUrl + '/push/face/index/staffPage', { params: { deptId: this.deptId } }).then((res) => {
         this.loading = false
         var result = res.data.data.rows
         for (var i = 0; i < result.length; i++) {
@@ -304,7 +317,7 @@ export default {
         }
       })
       // 查询小区人员年龄分布
-      this.$axios.get(this.apiUrl + '/push/face/index/queryAge').then((res) => {
+      this.$axios.get(this.apiUrl + '/push/face/index/queryAge', { params: { deptId: this.deptId } }).then((res) => {
         this.queryAgeData = res.data.data
       })
       // 查询设备列表
@@ -312,11 +325,11 @@ export default {
       //   this.deviceData = res.data.data.data
       // })
       // 查询进出口人流量
-      this.$axios.get(this.apiUrl + '/push/face/index/staffListByHour').then((res) => {
+      this.$axios.get(this.apiUrl + '/push/face/index/staffListByHour', { params: { deptId: this.deptId } }).then((res) => {
         this.flowData = res.data.data
       })
       // 查询人员性别
-      this.$axios.get(this.apiUrl + '/push/face/index/staffGender').then((res) => {
+      this.$axios.get(this.apiUrl + '/push/face/index/staffGender', { params: { deptId: this.deptId } }).then((res) => {
         this.querySexData = res.data.data
       })
     },
@@ -339,6 +352,18 @@ export default {
       } else {
         this.flowData.push(result.data)
       }
+    },
+    // 实时获取年龄结构
+    getAgeData (result) {
+      console.log(result)
+    },
+    // 男女比例
+    getSexData (result) {
+      console.log(result)
+    },
+    // 新增人员
+    getPersonData (result) {
+      console.log(result)
     },
     getAge (strAge) {
       let birthdays = new Date(strAge.replace(/-/g, '/'))

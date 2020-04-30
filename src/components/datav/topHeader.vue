@@ -4,16 +4,17 @@
       <img :src="logoImg" class="logo" alt="logo" />
     </div>
     <dv-decoration-5 class="header-center-decoration" />
-    <div class="header-right-decoration">
-      <div class="right-time-weather">
-        <div class="time">
-          {{ nowDate + ' ' + nowTime + ' ' + nowWeek }}
-        </div>
-        <div class="weather">
-          {{ localweather }}
-          <img :src="weatherImg" :style="{width:'20px',height:'20px'}">
-        </div>
-      </div>
+    <div class="header-right-decoration" justify="end">
+      <el-button type="primary" @click="SignOut">退出平台</el-button>
+<!--      <div class="right-time-weather">-->
+<!--        <div class="time">-->
+<!--          {{ nowDate + ' ' + nowTime + ' ' + nowWeek }}-->
+<!--        </div>-->
+<!--        <div class="weather">-->
+<!--          {{ localweather }}-->
+<!--          <img :src="weatherImg" :style="{width:'20px',height:'20px'}">-->
+<!--        </div>-->
+<!--      </div>-->
     </div>
     <dv-decoration-10 />
     <div class="center-title">陕西省公安厅雁塔区智慧安防小区管理平台</div>
@@ -38,6 +39,11 @@ export default {
     this.get_data()
   },
   methods: {
+    SignOut () {
+      this.$store.state.deptId = ''
+      this.$store.state.client = ''
+      this.$router.push({path: '/'})
+    },
     currentTime () {
       setInterval(this.getDate, 1000)
     },
@@ -116,6 +122,7 @@ export default {
     display: flex;
     align-items: center;
     box-sizing: border-box;
+    justify-content: flex-end;
     .right-time-weather{
       width: 100%;
       color: #00c2ff;
