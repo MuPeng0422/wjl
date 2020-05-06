@@ -356,14 +356,17 @@ export default {
     // 实时获取年龄结构
     getAgeData (result) {
       console.log(result)
+      this.queryAgeData.push(result.data)
     },
     // 男女比例
     getSexData (result) {
       console.log(result)
+      this.querySexData.push(result.data)
     },
     // 新增人员
     getPersonData (result) {
       console.log(result)
+      this.personenelData.push(result.data)
     },
     getAge (strAge) {
       let birthdays = new Date(strAge.replace(/-/g, '/'))

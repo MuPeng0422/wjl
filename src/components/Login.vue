@@ -35,6 +35,15 @@ export default {
       }
     }
   },
+  created () {
+    let that = this
+    document.onkeydown = (e) => {
+      e = window.event || e
+      if (that.$route.path === '/' && (e.keyCode === 13)) { // 验证在登录界面和按得键是回车键enter
+        that.onSubmit() // 登录函数
+      }
+    }
+  },
   methods: {
     onSubmit () {
       this.$axios.post(this.apiUrl + '/push/event/zhsqLogin', { username: this.form.username, password: this.form.password }).then((res) => {
