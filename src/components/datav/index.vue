@@ -286,7 +286,7 @@ export default {
         }
       })
       // 查询人员列表
-      this.$axios.get(this.apiUrl + '/push/face/index/staffPage', { params: { deptId: this.deptId } }).then((res) => {
+      this.$axios.get(this.apiUrl + '/push/face/index/staffPage', { params: { deptId: this.deptId, pageSize: 1000 } }).then((res) => {
         this.loading = false
         var result = res.data.data.rows
         for (var i = 0; i < result.length; i++) {
@@ -355,18 +355,42 @@ export default {
     },
     // 实时获取年龄结构
     getAgeData (result) {
-      console.log(result)
-      this.queryAgeData.push(result.data)
+      this.queryAgeData = result.data
     },
     // 男女比例
     getSexData (result) {
-      console.log(result)
-      this.querySexData.push(result.data)
+      this.querySexData = result.data
     },
     // 新增人员
     getPersonData (result) {
-      console.log(result)
-      this.personenelData.push(result.data)
+      var rows = []
+      if (result.data.staffGender === 1) {
+        this.sex = '男'
+      } else if (result.data.staffGender === 2) {
+        this.sex = '女'
+      } else {
+        this.sex = '未知'
+      }
+
+      if (result.data.staffType === 0) {
+        this.staffType = '业主'
+      } else if (result.data.staffType === 1) {
+        this.staffType = '家庭成员'
+      } else if (result.data.staffType === 2) {
+        this.staffType = '租客'
+      }
+
+      var birthDayTime = new Date(result.data.staffBirthday).getTime()
+      // 当前时间 毫秒
+      var nowTime = new Date().getTime()
+      // 一年毫秒数(365 * 86400000 = 31536000000)
+      this.age = Math.ceil((nowTime - birthDayTime) / 31536000000)
+      rows.push(result.data.staffName)
+      rows.push(this.sex)
+      rows.push(this.age)
+      rows.push(result.data.houseAddress)
+      rows.push(this.staffType)
+      this.personenelData.push(rows)
     },
     getAge (strAge) {
       let birthdays = new Date(strAge.replace(/-/g, '/'))
@@ -497,10 +521,12 @@ export default {
           .item{
             width: 100%;
             height: 60%;
+            background: #000;
+            text-align: center;
             overflow: hidden;
 
             img{
-              width: 100%;
+              height: 100%;
             }
           }
 

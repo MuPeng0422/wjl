@@ -13,7 +13,9 @@ export default {
     sexData: {
       deep: true,
       handler: function (res) {
-        console.log('性别：', res)
+        this.dataArr = []
+        this.xAxisArr = []
+        this.number = 0
         for (var i = 0; i < res.length; i++) {
           if (res[i].gender === '1') {
             this.xAxisArr.push('男')

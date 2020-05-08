@@ -19,6 +19,7 @@ export default {
     ageData: {
       deep: true,
       handler: function (res) {
+        this.data = []
         for (var i = 0; i < res.length; i++) {
           var rows = {}
           rows['name'] = res[i].ageGroup
